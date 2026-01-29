@@ -19,17 +19,17 @@ endif()
 
 find_package(Java REQUIRED)
 
-add_library(${PROJECT_NAME} SHARED )
+add_library(zs_types_template_2 SHARED )
 
 include(cmake/generate_cpp.cmake)
 
-target_include_directories(${PROJECT_NAME} PUBLIC 
+target_include_directories(zs_types_template_2 PUBLIC 
     ${zserio_types_cpp_include}
     ${zserio_types_cpp_genpath}
     #${ZSERIO_RUNTIME_DIR}/include
 )
 
-target_link_libraries(${PROJECT_NAME} 
+target_link_libraries( 
 PRIVATE ZserioCppRuntime
 )
 
