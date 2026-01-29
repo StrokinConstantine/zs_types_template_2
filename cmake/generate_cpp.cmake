@@ -1,6 +1,6 @@
 # Set up paths for generated files
-set(zserio_types_cpp_include ${CMAKE_CURRENT_BINARY_DIR}/include)
-set(zserio_types_cpp_genpath ${zserio_types_cpp_include}})
+#set(zserio_types_cpp_include ${CMAKE_CURRENT_BINARY_DIR}/include)
+set(zserio_types_cpp_genpath ${CMAKE_CURRENT_BINARY_DIR}/include)
 #file(MAKE_DIRECTORY ${zserio_types_cpp_genpath})
 
 include("$ENV{ZSERIO_CPP_RUNTIME}/../../cmake/zserio_compiler.cmake")

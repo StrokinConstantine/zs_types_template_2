@@ -24,7 +24,7 @@ add_library(zs_types_template_2 SHARED )
 include(cmake/generate_cpp.cmake)
 
 target_include_directories(zs_types_template_2 PUBLIC 
-    ${zserio_types_cpp_include}
+   # ${zserio_types_cpp_include}
     ${zserio_types_cpp_genpath}
     #${ZSERIO_RUNTIME_DIR}/include
 )
