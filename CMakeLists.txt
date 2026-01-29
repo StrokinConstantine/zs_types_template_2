@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.20)
 set(ZSERIO_TYPES_PROJECT_NAME "zs_types_template_2" CACHE STRING "name of cmake artifact")
 set(ZSERIO_TYPES_INCLUDE_PATH "zs_types_template_2" CACHE STRING "include path in c++")
 
-project(zs_types_template_2 LANGUAGES CXX)
+project(${ZSERIO_TYPES_PROJECT_NAME} LANGUAGES CXX)
 
 #set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/zserio")
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
