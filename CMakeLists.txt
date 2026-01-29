@@ -30,7 +30,7 @@ target_include_directories(zs_types_template_2 PUBLIC
 )
 
 target_link_libraries( 
-PRIVATE ZserioCppRuntime
+PUBLIC ZserioCppRuntime
 )
 
 
