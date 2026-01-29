@@ -29,8 +29,8 @@ target_include_directories(zs_types_template_2 PUBLIC
     #${ZSERIO_RUNTIME_DIR}/include
 )
 
-target_link_libraries( 
-PUBLIC ZserioCppRuntime
+target_link_libraries( zs_types_template_2
+PRIVATE ZserioCppRuntime
 )
 
 
