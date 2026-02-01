@@ -2,269 +2,224 @@ package euroradio_asc.subset_026.messages;
 
 import euroradio_asc.subset_026.packages.*;
 
-struct Message {
-    bit:8  id    ;
-    bit:16 length;
-    bit:32 time  ; ///< Время отправки сообщения (T_TRAIN)
 
-    ValidatedTrainDataMsg  validatedTrainDataMsg  if id == 129;
-    MaRequestMsg           maRequestMsg           if id == 132;
-    TrainPositionReportMsg trainPositionReportMsg if id == 136;
-    AckMsg                 ackMsg                 if id == 146;
-    AckOfESMsg             ackOfESMsg             if id == 147;
-    EndOfMissionMsg        endOfMissionMsg        if id == 150;
-    NoCVSMsg               noCVSMsg               if id == 154;
-    InitiationCSMsg        initiationCSMsg        if id == 155;
-    TerminationCSMsg       terminationCSMsg       if id == 156;
-    StartOfMissionPrMsg    startOfMissionPrMsg    if id == 157;
-    SessionEstablishedMsg  sessionEstablishedMsg  if id == 159;
-    ChannelStateMsg        channelStateMsg        if id == 160;
-    ActualDistanceMsg      actualDistanceMsg      if id == 161;
-    SrAuthMsg              srAuthMsg              if id == 2;
-    MovementAuthorityMsg   movementAuthorityMsg   if id == 3;
-    AckOfTrainDataMsg      ackOfTrainDataMsg      if id == 8;
-    UnconditionalESMsg     unconditionalESMsg     if id == 16;
-    RevocationOfESMsg      revocationOfESMsg      if id == 18;
-    GeneralMessage         generalMessage         if id == 24;
-    SystemVersionMsg       systemVersionMsg       if id == 32;
-    AckOfTerminationCSMsg  ackOfTerminationCSMsg  if id == 39;
-    TrainRejectedMsg       trainRejectedMsg       if id == 40;
-    TrainAcceptedMsg       trainAcceptedMsg       if id == 41;
+const uint8 ASCII_CODE_SENTENCE_START = 0x24; // ASCII for '$'
+const uint8 ASCII_CODE_SENTENCE_END = 0x2A; // ASCII for '*'
+const uint8 ASCII_CODE_COMMA = 0x2C; // ASCII for ','
+const uint8 ASCII_CODE_DOT = 0x2E; // ASCII for '.'
+const uint8 ASCII_CODE_N = 0x4E; // ASCII for 'N'
+const uint8 ASCII_CODE_S = 0x53; // ASCII for 'S'
+const uint8 ASCII_CODE_E = 0x45; // ASCII for 'E'
+const uint8 ASCII_CODE_W = 0x57; // ASCII for 'W'
+const uint8 ASCII_CODE_0 = 0x30; // ASCII for '0'
+const uint8 ASCII_CODE_8 = 0x38; // ASCII for '8'
+const uint8 ASCII_CODE_9 = 0x39; // ASCII for '9'
+const uint8 ASCII_CODE_1 = 0x31; // ASCII for '1'
+const uint8 ASCII_CODE_2 = 0x32; // ASCII for '2'
+const uint8 ASCII_CODE_M = 0x4D; // ASCII for 'M'
+const uint8 ASCII_CODE_G = 0x47; // ASCII for 'G'
+const uint8 ASCII_CODE_A = 0x41; // ASCII for 'A'
+
+const uint8 ASCII_CODE_MINUS = 0x2D; // ASCII for '-'
+
+const uint8 ASCII_CODE_CR = 0x0D; // ASCII for '<CR>'
+const uint8 ASCII_CODE_LF = 0x0A; // ASCII for '<LF>'
+
+struct Sentence
+{
+    uint8 sentenceStart = ASCII_CODE_SENTENCE_START : sentenceStart == ASCII_CODE_SENTENCE_START;
+    
+    uint8 talkerIdFirstChar;
+    uint8 talkerIdSecondChar;
+
+    uint8 sentenceIdFirstChar;
+    uint8 sentenceIdSecondChar;
+    uint8 sentenceIdThirdChar;
+
+    GGA gga if sentenceIdFirstChar == ASCII_CODE_G && sentenceIdSecondChar == ASCII_CODE_G && sentenceIdThirdChar == ASCII_CODE_A;
+
+    uint8 sentenceEnd = ASCII_CODE_SENTENCE_END : sentenceEnd == ASCII_CODE_SENTENCE_END;
+
+    uint8 checksumFirstChar;
+    uint8 checksumSecondChar;
+
+    uint8 cr = ASCII_CODE_CR : cr == ASCII_CODE_CR;
+    uint8 lf = ASCII_CODE_LF : lf == ASCII_CODE_CR;
 };
 
-/**
- * Заголовок сообщений БРУС -> РБЦ
- */
-struct ObuHeader {
-    bit:24 nid_engine; ///< ID OBU (NID_ENGINE)
+
+struct GGA {
+
+    uint8 timeComma = ASCII_CODE_COMMA : timeComma == ASCII_CODE_COMMA;
+
+    // Time (UTC) - hhmmss.sss format
+    uint8 timeHoursTens;
+    uint8 timeHoursOnes;
+    uint8 timeMinutesTens;
+    uint8 timeMinutesOnes;
+    uint8 timeSecondsTens;
+    uint8 timeSecondsOnes;
+    uint8 timeDot = ASCII_CODE_DOT : timeDot == ASCII_CODE_DOT;
+    uint8 timeSecondsDecimalTenths;
+    uint8 timeSecondsDecimalHundredths;                      
+    uint8 timeSecondsDecimalThousandths;
+    
+    uint8 latitudeComma = ASCII_CODE_COMMA : latitudeComma == ASCII_CODE_COMMA;
+
+    // Latitude - GGMM.MMMMM format
+    uint8 latitudeDegreesTens;
+    uint8 latitudeDegreesOnes;
+    uint8 latitudeMinutesTens;
+    uint8 latitudeMinutesOnes;
+    uint8 latitudeDot = ASCII_CODE_DOT : latitudeDot == ASCII_CODE_DOT;
+    uint8 latitudeDecimalTenths;
+    uint8 latitudeDecimalHundredths;
+    uint8 latitudeDecimalThousandths;
+    uint8 latitudeDecimalTenThousandths;
+    uint8 latitudeDecimalHundredThousandths;
+    
+    uint8 latitudeDirectionComma = ASCII_CODE_COMMA : latitudeDirectionComma == ASCII_CODE_COMMA;
+
+    // Latitude direction (N or S)
+    uint8 latitudeDirection = ASCII_CODE_N : latitudeDirection == ASCII_CODE_N || latitudeDirection == ASCII_CODE_S;
+    
+    uint8 longitudeComma = ASCII_CODE_COMMA : longitudeComma == ASCII_CODE_COMMA;
+    
+    // Longitude - GGGMM.MMMMM format  
+    uint8 longitudeDegreesHundreds;
+    uint8 longitudeDegreesTens;
+    uint8 longitudeDegreesOnes;
+    uint8 longitudeMinutesTens;
+    uint8 longitudeMinutesOnes;
+    uint8 longitudeDot = ASCII_CODE_DOT : longitudeDot == ASCII_CODE_DOT;
+    uint8 longitudeDecimalTenths;
+    uint8 longitudeDecimalHundredths;
+    uint8 longitudeDecimalThousandths;
+    uint8 longitudeDecimalTenThousandths;
+    uint8 longitudeDecimalHundredThousandths;
+    
+    uint8 longitudeDirectionComma = ASCII_CODE_COMMA : longitudeDirectionComma == ASCII_CODE_COMMA;
+    
+    // Longitude direction (E or W)
+    uint8 longitudeDirection = ASCII_CODE_E : longitudeDirection == ASCII_CODE_E || longitudeDirection == ASCII_CODE_W;
+    
+    uint8 gpsQualityIndicatorComma = ASCII_CODE_COMMA : gpsQualityIndicatorComma == ASCII_CODE_COMMA;
+    
+    // GPS Quality Indicator (0-8)
+    uint8 gpsQualityIndicator = ASCII_CODE_0 : gpsQualityIndicator >= ASCII_CODE_0 && gpsQualityIndicator <= ASCII_CODE_8;
+    
+    uint8 satellitesComma = ASCII_CODE_COMMA : satellitesComma == ASCII_CODE_COMMA;
+
+    // Number of satellites (00-12) - two ASCII digits
+    uint8 satellitesTens = ASCII_CODE_0 : satellitesTens >= ASCII_CODE_0 && satellitesTens <= ASCII_CODE_1;
+    uint8 satellitesOnes : (satellitesTens == ASCII_CODE_0) ? (satellitesOnes >= ASCII_CODE_0 && satellitesOnes <= ASCII_CODE_9) : (satellitesOnes >= ASCII_CODE_0 && satellitesOnes <= ASCII_CODE_2);
+    
+    uint8 hdopComma = ASCII_CODE_COMMA : hdopComma == ASCII_CODE_COMMA;
+
+    // Horizontal dilution of precision - x.x format
+    uint8 hdopFirstChar;
+    HDOPWithMinusSign hdopWithMinusSign if hdopFirstChar == ASCII_CODE_MINUS;
+    HDOPWithoutMinusSign hdopWithoutMinusSign if hdopFirstChar >= ASCII_CODE_0 && hdopFirstChar <= ASCII_CODE_9;
+    
+    uint8 altitudeComma = ASCII_CODE_COMMA : altitudeComma == ASCII_CODE_COMMA;
+
+    // Altitude above mean-sea-level - xxx.x format  
+    uint8 altitudeFirstChar;
+    AltitudeWithMinusSign altitudeWithMinusSign if altitudeFirstChar == ASCII_CODE_MINUS;
+    AltitudeWithoutMinusSign altitudeWithoutMinusSign if altitudeFirstChar >= ASCII_CODE_0 && altitudeFirstChar <= ASCII_CODE_9;
+    
+    uint8 altitudeUnitsComma = ASCII_CODE_COMMA : altitudeUnitsComma == ASCII_CODE_COMMA;
+
+    // Units of antenna altitude (always 'M')
+    uint8 altitudeUnits = ASCII_CODE_M : altitudeUnits == ASCII_CODE_M;
+    
+    uint8 geoidSepComma = ASCII_CODE_COMMA : geoidSepComma == ASCII_CODE_COMMA;
+
+    // Geoidal separation - xx.x format
+    uint8 geoidSepFirstChar;
+    GeoidSepWithMinusSign geoidSepWithMinusSign if geoidSepFirstChar == ASCII_CODE_MINUS;
+    GeoidSepWithoutMinusSign geoidSepWithoutMinusSign if geoidSepFirstChar >= ASCII_CODE_0 && geoidSepFirstChar <= ASCII_CODE_9;
+    
+    uint8 geoidSepUnitsComma = ASCII_CODE_COMMA : geoidSepUnitsComma == ASCII_CODE_COMMA;
+
+    // Units of geoidal separation (always 'M')
+    uint8 geoidSepUnits = ASCII_CODE_M : geoidSepUnits == ASCII_CODE_M;
+    
+    uint8 dgpsAgeComma = ASCII_CODE_COMMA : dgpsAgeComma == ASCII_CODE_COMMA;
+
+    // Age of differential GPS data
+    uint8 dgpsAgeFirstChar;
+    DgpsAgeWithMinusSign dgpsAgeWithMinusSign if dgpsAgeFirstChar == ASCII_CODE_MINUS;
+    DgpsAgeWithoutMinusSign dgpsAgeWithoutMinusSign if dgpsAgeFirstChar >= ASCII_CODE_0 && dgpsAgeFirstChar <= ASCII_CODE_9;
+    
+    uint8 dgpsStationComma = ASCII_CODE_COMMA : dgpsStationComma == ASCII_CODE_COMMA;
+
+    // DGPS reference station ID - 0000-1023
+    uint8 dgpsStationFirstChar;
+    uint8 dgpsStationSecondChar;
+    uint8 dgpsStationThirdChar;
+    uint8 dgpsStationFourthChar;
+
 };
 
-/**
- * Заголовок сообщений РБЦ -> БРУС
- */
-struct RbcHeader {
-    bool   ack           ; ///< Флаг запроса подтверждения (M_ACK)
-    bit:24 last_balise_id; ///< Идентификатор последней пройденной бализы
-                           ///< (NID_LRBG)
+
+// HDOP structures (x.x format)
+struct HDOPWithMinusSign {
+    uint8 hdopWhole;                    // Only one whole digit after minus
+    uint8 hdopDot = ASCII_CODE_DOT : hdopDot == ASCII_CODE_DOT;
+    uint8 hdopDecimal;
 };
 
-/**
- * Сообщение 129 Validated Train ValidatedTrainDataPkg
- */
-struct ValidatedTrainDataMsg {
-    ObuHeader             header;
-    PositionReportPkg     position;
-    TrainRunningNumberPkg number;
-    ValidatedTrainDataPkg data;
+struct HDOPWithoutMinusSign {
+    uint8 hdopWhole;                    // First whole digit
+    uint8 hdopDot = ASCII_CODE_DOT : hdopDot == ASCII_CODE_DOT;
+    uint8 hdopDecimal;
 };
 
-/**
- * Сообщение 132 MA Request
- */
-struct MaRequestMsg {
-    ObuHeader                      header             ;
-    bit:5                          reason             ; ///< Причина запроса Q_MARQSTREASON
-    PositionReportPkg              position           ;
-    optional ShuntingParametersPkg shunting_parameters;
-    optional SrdoPkg               srdo_pkg           ;
+// Altitude structures (xxx.x format)
+struct AltitudeWithMinusSign {
+    uint8 altitudeHundreds;             // First digit after minus
+    uint8 altitudeTens;                 // Second digit
+    uint8 altitudeOnes;                 // Third digit  
+    uint8 altitudeDot = ASCII_CODE_DOT : altitudeDot == ASCII_CODE_DOT;
+    uint8 altitudeDecimal;
 };
 
-/**
- * Сообщение 136 Train PositionReportPkg Report
- */
-struct TrainPositionReportMsg {
-    ObuHeader                      header             ;
-    PositionReportPkg              position           ;
-    TrainRunningNumberPkg          number             ;
-    optional ShuntingParametersPkg shunting_parameters;
-    optional SrdoPkg               srdo_pkg           ;
+struct AltitudeWithoutMinusSign {
+    uint8 altitudeTens;                 // First digit (hundreds moved to GGA)
+    uint8 altitudeOnes;                 // Second digit
+    uint8 altitudeDot = ASCII_CODE_DOT : altitudeDot == ASCII_CODE_DOT;
+    uint8 altitudeDecimal;
 };
 
-/**
- * Сообщение 146 AckMsg
- */
-struct AckMsg {
-    ObuHeader header;
-    bit:32    confirmation_time; ///< Время отправки подтверждаемого сообщения
-                                 ///< (T_TRAIN)
+// Geoidal separation structures (xx.x format)  
+struct GeoidSepWithMinusSign {
+    uint8 geoidSepTens;                 // First digit after minus
+    uint8 geoidSepOnes;                 // Second digit
+    uint8 geoidSepDot = ASCII_CODE_DOT : geoidSepDot == ASCII_CODE_DOT;
+    uint8 geoidSepDecimal;
 };
 
-/**
- * Сообщение 147 AckMsg of Emergency Stop
- */
-struct AckOfESMsg {
-    ObuHeader         header  ;
-    bit:4             es_id   ; ///< Идентификатор сообщения аварийной остановки (NID_EM)
-    bit:2             is_stop ; ///< Результат подтверждения аварийной     остановки
-                                                                                                                                      ///< (Q_EMERGENCYSTOP), 1 or 2 bits???
-    PositionReportPkg position;
+struct GeoidSepWithoutMinusSign {
+    uint8 geoidSepOnes;                 // First digit (tens moved to GGA)
+    uint8 geoidSepDot = ASCII_CODE_DOT : geoidSepDot == ASCII_CODE_DOT;
+    uint8 geoidSepDecimal;
 };
 
-/**
- * Сообщение 150 End of Mission
- */
-struct EndOfMissionMsg {
-    ObuHeader header;
-    PositionReportPkg position;
+// DGPS Age structures (xxx.xx format - always positive in practice)
+struct DgpsAgeWithMinusSign {
+    uint8 dgpsAgeFirstChar;             // First digit after minus
+    uint8 dgpsAgeSecondChar;            // Second digit
+    uint8 dgpsAgeThirdChar;             // Third digit
+    uint8 dgpsAgeDot = ASCII_CODE_DOT : dgpsAgeDot == ASCII_CODE_DOT;
+    uint8 dgpsAgeFourthChar;            // Fourth digit
+    uint8 dgpsAgeFifthChar;             // Fifth digit
 };
 
-/**
- * Сообщение 154 No compatible version supported
- */
-struct NoCVSMsg {
-    ObuHeader header;
+struct DgpsAgeWithoutMinusSign {
+    uint8 dgpsAgeSecondChar;            // First digit (first char in GGA)
+    uint8 dgpsAgeThirdChar;             // Second digit
+    uint8 dgpsAgeDot = ASCII_CODE_DOT : dgpsAgeDot == ASCII_CODE_DOT;
+    uint8 dgpsAgeFourthChar;            // Third digit
+    uint8 dgpsAgeFifthChar;             // Fourth digit
 };
-
-/**
- * Сообщение 155 Initiation of a communication session
- */
-struct InitiationCSMsg {
-    ObuHeader header;
-    TrainRunningNumberPkg number;
-};
-
-/**
- * Сообщение 156 Termination of a communication session
- */
-struct TerminationCSMsg {
-    ObuHeader header;
-};
-
-/**
- * Сообщение 157 Start Of Mission PositionReportPkg Report
- */
-struct StartOfMissionPrMsg {
-    ObuHeader header                   ;
-    bit:2 status                        ; ///< Статус данных местоположения (Q_STATUS), 1 or 2 bits???
-    PositionReportPkg position         ;
-    TrainRunningNumberPkg number       ;
-
-    optional AppDataFromObuPkg app_data;
-};
-
-/**
- * Сообщение 159 Session established
- */
-struct SessionEstablishedMsg {
-    ObuHeader header;
-};
-
-/**
- * Сообщение 160 Channels state - not from Subset-026
- */
-struct ChannelStateMsg {
-    ObuHeader header;
-    bool is_normal_alive;
-    bool is_redundant_alive;
-};
-
-/**
- * Сообщение 161 Actual Distance - not from Subset-026
- */
-struct ActualDistanceMsg {
-    ObuHeader header;
-    bit:16 distance;
-    bit:16 allowed_speed;
-    bit:16 distance_to_target;
-};
-
-/**
- * Сообщение 2 SR Authorisation
- */
-struct SrAuthMsg {
-    RbcHeader header;
-    bit:2  scale   ; ///< Шкала расстояний, устанавливается в 1 (Q_SCALE)
-    bit:15 distance; ///< Расстояние в режиме SR (D_SR)
-
-    optional ListOfBalisesInSrAuthPkg balises;
-};
-
-/**
- * Сообщение 3 Movement Authority: Разрешение на движение
- */
-struct MovementAuthorityMsg {
-    RbcHeader header;
-    LinkingPkg links;
-    MovementAuthPkg movement_auth;
-
-    optional LvlTransitionOrderPkg lvl_transition_order;
-    optional TemporarySpeedRestrPkg speed_restr;
-    optional TemporarySpeedRestrRevPkg speed_restr_rev;
-    optional InternationalStaticSpeedProfile speed_profiles;
-    optional GradientProfile gradient_profiles;
-};
-
-/**
- * Сообщение 8 AckMsg of Train ValidatedTrainDataPkg: Подтверждение данных
- * поезда
- */
-struct AckOfTrainDataMsg {
-    RbcHeader header;
-    bit:32 time; ///< Время отправки подтверждаемого сообщения с пакетом 11
-};
-
-/**
- * Сообщение 16 Unconditional Emergency Stop: Безусловная аварийная остановка
- */
-struct UnconditionalESMsg {
-    RbcHeader header;
-    bit:4 es_id; ///< Идентификатор сообщения аварийной остановки (NID_EM)
-};
-
-/**
- * Сообщение 18 Revocation of Emergency Stop
- */
-struct RevocationOfESMsg {
-    RbcHeader header;
-    bit:4 es_id; ///< Идентификатор сообщения аварийной остановки (NID_EM)
-};
-
-/**
- * Сообщение 24 General message: Сообщение общего типа
- */
-struct GeneralMessage {
-    RbcHeader header;
-
-    optional SessionManagementPkg session_management;
-    optional AppDataFromRbcPkg    app_data          ;
-    optional ShuntingCommandPkg   shunting_command  ;
-    optional AlsSignalsPkg        als_signals       ;
-    optional SrdoPkg              srdo_pkg          ;
-};
-
-/**
- * Сообщение 32 RBC/RIU System Version: Конфигурация РБЦ
- */
-struct SystemVersionMsg {
-    RbcHeader header;
-    bit:7 version; ///< Версия ETCS. Устанавливается в 010 0001 (M_VERSION)
-};
-
-/**
- * Сообщение 39 AckMsg of termination of a communication session: Подтверждение
- * завершения сеанса связи
- */
-struct AckOfTerminationCSMsg {
-    RbcHeader header;
-};
-
-/**
- * Сообщение 40 Train Rejected: Поезд отклонен
- */
-struct TrainRejectedMsg {
-    RbcHeader header;
-
-    /// Причина отклонения (не из Subset-026) (NID_REJECT_REASON)
-    /// 0 - Неизвестно
-    /// 1 - Несоответствие версии БД
-    /// 2 - Нет занятости рельсовой цепи под локомотивом
-    bit:2 reason;
-};
-
-/**
- * Сообщение 41 Train Accepted: Поезд принят
- */
-struct TrainAcceptedMsg {
-    RbcHeader header;
-};
-
